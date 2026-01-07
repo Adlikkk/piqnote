@@ -1,0 +1,9 @@
+{
+  "style": "conventional",
+  "scope": "app",
+  "maxSubjectLength": 72,
+  "language": "en",
+  "bulletPrefix": "-",
+  "provider": "mock",
+  "offline": false
+}

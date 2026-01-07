@@ -1,0 +1,51 @@
+{
+  "name": "piqnote",
+  "version": "0.1.0",
+  "description": "Piqnote CLI by PromethIQ - generate high-quality Git commit messages.",
+  "license": "AGPL-3.0-only",
+  "bin": {
+    "piqnote": "dist/cli.js"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "npm run build && node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "lint": "tsc --noEmit -p .",
+    "test": "npm run build",
+    "release:changelog": "npx release-please release-pr",
+    "release:tag": "npx release-please github-release"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "cli",
+    "conventional commits",
+    "promethiq",
+    "piqnote"
+  ],
+  "author": "Adam Kudlík",
+  "homepage": "https://github.com/promethiq/piqnote",
+  "bugs": {
+    "url": "https://github.com/promethiq/piqnote/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/promethiq/piqnote.git"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.9",
+    "@types/node": "^22.0.0",
+    "release-please": "^16.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
