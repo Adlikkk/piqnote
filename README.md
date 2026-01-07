@@ -20,7 +20,7 @@ Piqnote is an AGPL-licensed, frontend-aware Git commit message generator by Prom
 
 ## Installation
 ```bash
-git clone https://github.com/promethiq/piqnote.git
+git clone https://github.com/Adlikkk/piqnote.git
 cd piqnote
 npm install
 npm run build

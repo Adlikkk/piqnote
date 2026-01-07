@@ -23,13 +23,13 @@
     "piqnote"
   ],
   "author": "Adam Kudlík",
-  "homepage": "https://github.com/promethiq/piqnote",
+  "homepage": "https://github.com/Adlikkk/piqnote",
   "bugs": {
-    "url": "https://github.com/promethiq/piqnote/issues"
+    "url": "https://github.com/Adlikkk/piqnote/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/promethiq/piqnote.git"
+    "url": "https://github.com/Adlikkk/piqnote.git"
   },
   "dependencies": {
     "chalk": "^4.1.2",
