@@ -9,7 +9,7 @@ import { PiqnoteConfig, AiProviderName, AiConfig } from "./config/types";
 import { analyzeDiff, DiffInsights } from "./analyzer/diffAnalyzer";
 import { scoreCommit } from "./analyzer/scorer";
 import { formatCommit } from "./formatter/commitFormatter";
-import { getProvider, generateWithProvider } from "./ai/factory";
+import { getProvider, generateWithProvider, resolveGithubEnvToken } from "./ai/factory";
 import {
   isGitRepo,
   hasStagedChanges,
@@ -649,9 +649,12 @@ async function main() {
       let apiKey = opts.apiKey;
 
       if (!apiKey) {
-        if (provider === "github" && process.env.GITHUB_TOKEN) {
-          apiKey = "env:GITHUB_TOKEN";
-          console.log(chalk.gray("Detected GITHUB_TOKEN in environment; wiring it in config."));
+        if (provider === "github") {
+          const detected = resolveGithubEnvToken();
+          if (detected) {
+            apiKey = `env:${detected.env}`;
+            console.log(chalk.gray(`Detected ${detected.env} in environment; wiring it in config.`));
+          }
         } else if (provider === "openai" && process.env.OPENAI_API_KEY) {
           apiKey = "env:OPENAI_API_KEY";
           console.log(chalk.gray("Detected OPENAI_API_KEY in environment; wiring it in config."));

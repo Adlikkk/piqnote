@@ -2,7 +2,7 @@
   "ai": {
     "provider": "github",
     "model": "gpt-4o-mini",
-    "apiKey": "env:GITHUB_TOKEN",
+    "apiKey": "env:PIQNOTE_GITHUB_TOKEN",
     "endpoint": "https://models.inference.ai.azure.com/chat/completions",
     "temperature": 0.2,
     "maxTokens": 120

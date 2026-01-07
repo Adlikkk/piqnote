@@ -18,6 +18,26 @@ function resolveApiKey(token?: string): string {
   return token;
 }
 
+export const GITHUB_AI_ENV_VARS = [
+  "PIQNOTE_GITHUB_TOKEN",
+  "GITHUB_MODELS_TOKEN",
+  "GITHUB_MODEL_TOKEN",
+  "GITHUB_FINE_GRAINED_TOKEN",
+  "GITHUB_FINEGRAINED_TOKEN",
+  "GITHUB_PAT",
+  "GITHUB_TOKEN",
+] as const;
+
+export function resolveGithubEnvToken(): { env: string; value: string } | undefined {
+  for (const env of GITHUB_AI_ENV_VARS) {
+    const value = process.env[env];
+    if (value && value.trim()) {
+      return { env, value };
+    }
+  }
+  return undefined;
+}
+
 export function getProvider(config: PiqnoteConfig, options: ProviderOptions = {}): AiProvider {
   const offline = options.offline ?? config.offline;
   if (offline) {
@@ -25,7 +45,8 @@ export function getProvider(config: PiqnoteConfig, options: ProviderOptions = {}
   }
 
   const ai = config.ai || { provider: "mock" };
-  const envFallback = ai.provider === "github" ? process.env.GITHUB_TOKEN : process.env.OPENAI_API_KEY;
+  const githubToken = resolveGithubEnvToken();
+  const envFallback = ai.provider === "github" ? githubToken?.value : process.env.OPENAI_API_KEY;
   const apiKey = resolveApiKey(options.apiKey || ai.apiKey) || envFallback || "";
 
   switch (ai.provider) {

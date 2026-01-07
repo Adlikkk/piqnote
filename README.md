@@ -14,6 +14,10 @@ Piqnote is an AGPL-licensed, frontend-aware Git commit message generator by Prom
 - Git-aware filtering (respects .gitignore; avoids noisy artifacts)
 - Branch creation from a chosen base and push-back finish step
 
+## Prerequisites
+- Node.js >= 20.8.1 (semantic-release v24+ requires this; `nvm use` reads `.nvmrc`)
+- npm 10+ (bundled with Node 20)
+
 ## Installation
 ```bash
 git clone https://github.com/promethiq/piqnote.git
@@ -49,23 +53,44 @@ Common flags:
 - `--help` show all commands and options
 
 ## Configuration
-Create a `.piqnoterc` in your repo root:
+Create a `.piqnoterc` in your repo root (auto-generated via `piqnote config`):
 ```json
 {
-  "style": "conventional",
-  "scope": "web",
-  "maxSubjectLength": 72,
+  "ai": {
+    "provider": "github",
+    "model": "gpt-4o-mini",
+    "endpoint": "https://models.inference.ai.azure.com/chat/completions",
+    "apiKey": "env:PIQNOTE_GITHUB_TOKEN",
+    "temperature": 0.2,
+    "maxTokens": 120
+  },
+  "commit": {
+    "style": "conventional",
+    "maxSubjectLength": 72,
+    "maxBullets": 2,
+    "bulletPrefix": "-"
+  },
   "language": "en",
-  "bulletPrefix": "-",
-  "provider": "mock",
-  "offline": false
+  "scope": "core",
+  "offline": false,
+  "baseBranch": "main"
 }
 ```
 
-Environment (optional for OpenAI provider):
-- OPENAI_API_KEY
-- OPENAI_MODEL (default: gpt-4o-mini)
-- OPENAI_BASE_URL (optional)
+### GitHub Models token (fine-grained PAT)
+GitHub Models currently requires a fine-grained personal access token with the **AI/ML → Read access to all models** permission. After creating it:
+
+1. Store it in one of the supported env vars (the CLI checks them in order):
+   - `PIQNOTE_GITHUB_TOKEN`
+   - `GITHUB_MODELS_TOKEN`
+   - `GITHUB_MODEL_TOKEN`
+   - `GITHUB_FINE_GRAINED_TOKEN` or `GITHUB_FINEGRAINED_TOKEN`
+   - `GITHUB_PAT`
+   - `GITHUB_TOKEN` (default GitHub Actions token, if it has model access)
+2. Example (PowerShell): `setx PIQNOTE_GITHUB_TOKEN "github_pat_xxx"`
+3. Run `piqnote config --provider github --api-key env:PIQNOTE_GITHUB_TOKEN` (or omit `--api-key`; the CLI auto-detects the env var above).
+
+For OpenAI’s public API, set `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-4o-mini`), and optionally `OPENAI_BASE_URL`, then run `piqnote config --provider openai`.
 
 ## Contribution Workflow
 - Always branch from `main` (use `piqnote start --base main <feature-branch>`).
