@@ -25,13 +25,20 @@ export function formatCommit(
   payload: CommitMessagePayload,
   config: PiqnoteConfig
 ): string {
-  const baseSubject = truncate(payload.subject, config.maxSubjectLength || 72);
+  const subjectLimit = config.commit?.maxSubjectLength || 72;
+  const bulletLimit = config.commit?.maxBullets || 2;
+  const bulletPrefix = config.commit?.bulletPrefix || "-";
+  const baseSubject = truncate(payload.subject, subjectLimit);
+  const desiredScope = config.scope || payload.insightsScope || "core";
+  const withScopeFix = baseSubject.replace(/^(feat|fix)(!?:)/, `$1(${desiredScope})$2`);
   const scoped =
-    config.style === "conventional"
-      ? ensureConventional(baseSubject, config.scope || payload.insightsScope)
+    config.commit?.style === "conventional"
+      ? ensureConventional(withScopeFix, desiredScope)
       : baseSubject;
-  const bullets = payload.bullets?.length
-    ? payload.bullets.map((b) => `${config.bulletPrefix} ${b.trim()}`)
-    : [];
+  const bullets = (payload.bullets || [])
+    .map((b) => b.trim())
+    .filter(Boolean)
+    .slice(0, bulletLimit)
+    .map((b) => `${bulletPrefix} ${b}`);
   return [scoped, ...bullets].join("\n");
 }

@@ -1,7 +1,6 @@
 import { DiffInsights } from "../analyzer/diffAnalyzer";
 
 export interface AiRequest {
-  diff: string;
   insights: DiffInsights;
   language: string;
   style: string;
@@ -16,4 +15,5 @@ export interface AiResponse {
 export interface AiProvider {
   name: string;
   generate(request: AiRequest): Promise<AiResponse>;
+  generateMany?(request: AiRequest, count: number): Promise<AiResponse[]>;
 }

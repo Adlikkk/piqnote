@@ -5,6 +5,7 @@ export interface DiffInsights {
   summary: string;
   isFrontend: boolean;
   filesTouched: number;
+  fileKinds: string[];
 }
 
 function extractFilePaths(diff: string): string[] {
@@ -84,6 +85,14 @@ export function analyzeDiff(diff: string): DiffInsights {
   const summary = buildSummary(topics, scope);
   const frontendExtensions = [".tsx", ".jsx", ".css", ".scss", ".sass", ".vue"];
   const isFrontend = files.some((file) => frontendExtensions.some((ext) => file.toLowerCase().endsWith(ext)));
+  const fileKinds = Array.from(
+    new Set(
+      files.map((f) => {
+        const parts = f.split(".");
+        return parts.length > 1 ? parts.pop() || "" : "";
+      }).filter(Boolean)
+    )
+  );
 
   return {
     scope,
@@ -92,5 +101,6 @@ export function analyzeDiff(diff: string): DiffInsights {
     summary,
     isFrontend,
     filesTouched: files.length,
+    fileKinds,
   };
 }

@@ -14,41 +14,72 @@ interface OpenAiResponse {
   choices: OpenAiChoice[];
 }
 
+export interface OpenAiProviderConfig {
+  providerName?: string;
+  endpoint?: string;
+  apiKey?: string;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  warnOnMissingKey?: boolean;
+  fallback?: AiProvider;
+}
+
 export class OpenAiProvider implements AiProvider {
-  public name = "openai";
+  public name: string;
   private endpoint: string;
   private apiKey: string;
   private model: string;
-  private fallback = new LocalAiProvider();
+  private temperature: number;
+  private maxTokens?: number;
+  private fallback: AiProvider;
+  private warnOnMissingKey: boolean;
 
-  constructor() {
-    this.endpoint = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1/chat/completions";
-    this.apiKey = process.env.OPENAI_API_KEY || "";
-    this.model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  constructor(config: OpenAiProviderConfig = {}) {
+    this.name = config.providerName || "openai";
+    this.endpoint = config.endpoint || process.env.OPENAI_BASE_URL || "https://api.openai.com/v1/chat/completions";
+    this.apiKey = config.apiKey || process.env.OPENAI_API_KEY || "";
+    this.model = config.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+    this.temperature = config.temperature ?? 0.4;
+    this.maxTokens = config.maxTokens;
+    this.warnOnMissingKey = config.warnOnMissingKey ?? false;
+    this.fallback = config.fallback || new LocalAiProvider();
   }
 
   async generate(request: AiRequest): Promise<AiResponse> {
     if (!this.apiKey) {
+      if (this.warnOnMissingKey) {
+        console.warn(`Piqnote: Missing API key for ${this.name} provider; falling back to heuristic mode.`);
+      }
       return this.fallback.generate(request);
     }
 
     const prompt = this.buildPrompt(request);
 
     try {
+      const body: Record<string, unknown> = {
+        model: this.model,
+        temperature: this.temperature,
+        messages: prompt,
+      };
+
+      if (this.maxTokens !== undefined) {
+        body.max_tokens = this.maxTokens;
+      }
+
       const response = await fetch(this.endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.apiKey}`,
         },
-        body: JSON.stringify({
-          model: this.model,
-          temperature: 0.4,
-          messages: prompt,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
+        if (this.warnOnMissingKey) {
+          console.warn(`Piqnote: ${this.name} request failed (${response.status}); using heuristic mode.`);
+        }
         return this.fallback.generate(request);
       }
 
@@ -65,14 +96,28 @@ export class OpenAiProvider implements AiProvider {
     }
   }
 
+  async generateMany(request: AiRequest, count: number): Promise<AiResponse[]> {
+    const first = await this.generate(request);
+    if (this.fallback.generateMany) {
+      const extras = await this.fallback.generateMany(request, count - 1);
+      return [first, ...extras].slice(0, count);
+    }
+
+    const extras: AiResponse[] = [];
+    for (let i = 1; i < count; i += 1) {
+      extras.push(await this.fallback.generate(request));
+    }
+    return [first, ...extras].slice(0, count);
+  }
+
   private buildPrompt(request: AiRequest): OpenAiChatMessage[] {
-    const { diff, insights, language, style } = request;
+    const { insights, language, style } = request;
     const scopeText = insights.scope ? `Scope: ${insights.scope}` : "";
     return [
       {
         role: "system",
         content:
-          "You are a commit message assistant. Generate a concise Git commit message with subject <=72 characters. Include optional bullet points. Use Conventional Commits if style=conventional. Be frontend-aware for React/CSS/UI changes.",
+          "You are a commit message assistant. Produce a disciplined, short Git commit message (<=72 chars subject, max 2 bullets). Use Conventional Commits when style=conventional. Avoid file paths and build artifacts.",
       },
       {
         role: "user",
@@ -80,8 +125,9 @@ export class OpenAiProvider implements AiProvider {
           `Language: ${language}`,
           `Style: ${style}`,
           scopeText,
-          "Diff:",
-          diff.slice(0, 6000),
+          `Topics: ${insights.topics.join(", ")}`,
+          `Summary: ${insights.summary}`,
+          `File types: ${insights.fileKinds.join(", ")}`,
         ]
           .filter(Boolean)
           .join("\n"),

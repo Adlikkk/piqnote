@@ -1,6 +1,6 @@
 {
   "name": "piqnote",
-  "version": "0.1.0",
+  "version": "0.0.0-development",
   "description": "Piqnote CLI by PromethIQ - generate high-quality Git commit messages.",
   "license": "AGPL-3.0-only",
   "bin": {
@@ -12,9 +12,7 @@
     "start": "npm run build && node dist/cli.js",
     "dev": "ts-node src/cli.ts",
     "lint": "tsc --noEmit -p .",
-    "test": "npm run build",
-    "release:changelog": "npx release-please release-pr",
-    "release:tag": "npx release-please github-release"
+    "test": "npm run build"
   },
   "keywords": [
     "git",
@@ -39,9 +37,13 @@
     "inquirer": "^9.2.12"
   },
   "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/npm": "^12.0.0",
+    "@semantic-release/release-notes-generator": "^13.0.0",
     "@types/inquirer": "^9.0.9",
     "@types/node": "^22.0.0",
-    "release-please": "^16.3.0",
+    "semantic-release": "^24.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.0"
   },

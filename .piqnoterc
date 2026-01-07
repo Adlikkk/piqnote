@@ -1,9 +1,20 @@
 {
-  "style": "conventional",
-  "scope": "app",
-  "maxSubjectLength": 72,
+  "ai": {
+    "provider": "github",
+    "model": "gpt-4o-mini",
+    "apiKey": "env:GITHUB_TOKEN",
+    "endpoint": "https://models.inference.ai.azure.com/chat/completions",
+    "temperature": 0.2,
+    "maxTokens": 120
+  },
+  "commit": {
+    "style": "conventional",
+    "maxSubjectLength": 72,
+    "maxBullets": 2,
+    "bulletPrefix": "-"
+  },
+  "scope": "core",
   "language": "en",
-  "bulletPrefix": "-",
-  "provider": "mock",
-  "offline": false
+  "offline": false,
+  "baseBranch": "main"
 }
