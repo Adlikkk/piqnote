@@ -1,4 +1,5 @@
 {
+  "repositoryUrl": "https://github.com/Adlikkk/piqnote.git",
   "branches": ["main"],
   "plugins": [
     "@semantic-release/commit-analyzer",
