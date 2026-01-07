@@ -1,7 +1,7 @@
 # Piqnote CLI by PromethIQ
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
-[![Build](https://img.shields.io/github/actions/workflow/status/promethiq/piqnote/ci.yml?label=ci)](https://github.com/Adlikkk/piqnote/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/Adlikkk/piqnote/ci.yml?label=ci)](https://github.com/Adlikkk/piqnote/actions)
 [![NPM Version](https://img.shields.io/npm/v/piqnote.svg)](https://www.npmjs.com/package/piqnote)
 
 Piqnote is an AGPL-licensed, frontend-aware Git commit message generator by PromethIQ. It supports Conventional Commits, interactive review, commit quality scoring, offline heuristics, and optional auto-commit workflows.
